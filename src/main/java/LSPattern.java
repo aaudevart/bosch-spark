@@ -21,7 +21,7 @@ public class LSPattern implements Serializable {
     final static Logger logger = LoggerFactory.getLogger(LSPattern.class);
 
     public DataFrame loadCSVToDataFrame(SQLContext sqlContext, String fileName) {
-      logger.info("Loading CSV file {} into Dataframe", fileName);
+        logger.info("Loading CSV file {} into Dataframe", fileName);
 
         DataFrame dataFrame = sqlContext
                 .read()
@@ -33,67 +33,93 @@ public class LSPattern implements Serializable {
         return dataFrame;
     }
 
-    public JavaPairRDD<Integer, List<String>> findCategoricalPattern (DataFrame categoricalDF) {
+    private Map<String, String> buildHeaderLineCateg(List<String> cols, Row values) {
+
+        Map<String, String> res = new HashMap<>();
+
+        for (int i = 1; i < cols.size(); i++) {
+            res.put(cols.get(i), values.getString(i));
+        }
+
+        return res;
+    }
+
+    private Map<String, Double> buildHeaderLineNum(List<String> cols, Row values) {
+
+        Map<String, Double> res = new HashMap<>();
+
+        for (int i = 1; i < cols.size() - 1; i++) {
+            Double val = null;
+            if (values.get(i) instanceof  Double) {
+                val = (Double) values.get(i);
+            }
+            res.put(cols.get(i), val);
+        }
+
+        return res;
+    }
+
+    public JavaPairRDD<Integer, List<String>> findCategoricalPattern(DataFrame categoricalDF) {
 
         JavaRDD<Row> categoricalRDD = categoricalDF.javaRDD();
 
-        final String[] cols = categoricalDF.columns();
+        List<String> columns = Arrays.asList(categoricalDF.columns());
 
-        return categoricalRDD.mapToPair(new PairFunction<Row, Integer, List<String>>() {
+        return categoricalRDD.mapToPair((PairFunction<Row, Integer, List<String>>) row -> {
 
-            public Tuple2<Integer, List<String>> call(Row t) throws Exception {
+            Integer key = row.getInt(0);
 
-                Integer key = t.getInt(0);
+            Map<String, String> headerLinesMap = buildHeaderLineCateg(columns, row);
 
-                List pattern = new ArrayList();
+            Set<String> pattern = new HashSet<>();
 
-                for (int i = 1; i <= cols.length -1 ; i++) {
-                    if (!t.get(i).equals("")) {
-                        String col = cols[i].split("_F")[0];
-                        if (!pattern.contains(col)) {
-                            pattern.add(col);
-                        }
-                    }
-                }
+            headerLinesMap.entrySet()
+                    .stream()
+                    .filter(s -> !s.getValue().isEmpty()) // nom de la colonne et non la valeur !
+                    .forEach(s -> {
+                        String elt = s.getKey().split("_F")[0];
+                        pattern.add(elt);
+                    });
 
-                Tuple2<Integer, List<String>> tuple = new Tuple2<Integer, List<String>>(key, pattern);
-                return tuple;
-            }
+            List result = new ArrayList<>(pattern);
+            Collections.sort(result);
+
+            return new Tuple2<>(key, result);
         });
 
     }
 
-    public JavaPairRDD<Integer, List<String>> findNumericalPattern (DataFrame numericalDF) {
+    public JavaPairRDD<Integer, List<String>> findNumericalPattern(DataFrame numericalDF) {
 
         JavaRDD<Row> numericalRDD = numericalDF.javaRDD();
 
-        final String[] cols = numericalDF.columns();
+        List<String> columns = Arrays.asList(numericalDF.columns());
 
-        return numericalRDD.mapToPair(new PairFunction<Row, Integer, List<String>>() {
+        return numericalRDD.mapToPair((PairFunction<Row, Integer, List<String>>) row -> {
 
-            public Tuple2<Integer, List<String>> call(Row t) throws Exception {
+            Integer key = row.getInt(0);
 
-                Integer key = t.getInt(0);
+            Map<String, Double> headerLinesMap = buildHeaderLineNum(columns, row);
 
-                List pattern = new ArrayList();
+            Set<String> pattern = new HashSet<>();
 
-                for (int i = 1; i <= cols.length - 2; i++) {
-                    if (t.get(i) != null) {
-                        String col = cols[i].split("_F")[0];
-                        if (!pattern.contains(col)) {
-                            pattern.add(col);
-                        }
-                    }
-                }
+            headerLinesMap.entrySet()
+                    .stream()
+                    .filter(rowValue -> rowValue.getValue() != null)
+                    .forEach(column -> {
+                        String col = column.getKey().split("_F")[0];
+                        pattern.add(col);
+                    });
 
-                Tuple2<Integer, List<String>> tuple = new Tuple2<Integer, List<String>>(key, pattern);
-                return tuple;
-            }
+            List result = new ArrayList<>(pattern);
+            Collections.sort(result);
+
+            return new Tuple2<>(key, result);
         });
 
     }
 
-    public JavaPairRDD<String, List<Integer>> mergeCategNum (JavaPairRDD categRDD, JavaPairRDD numRDD) {
+    public JavaPairRDD<String, List<Integer>> mergeCategNum(JavaPairRDD categRDD, JavaPairRDD numRDD) {
 
         JavaPairRDD mergeRDD = categRDD.join(numRDD);
 
@@ -120,8 +146,6 @@ public class LSPattern implements Serializable {
                 result = result + elt;
             }
 
-           // System.out.println(result + " " + id);
-
             return new Tuple2<>(result, id);
         });
 
@@ -145,8 +169,9 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ LOAD NUMERICAL  ============");
 
-        DataFrame numericalDF = lsPattern.loadCSVToDataFrame(sqlContext,
-        "data/numSmall.csv"); //train_numeric.csv
+        DataFrame numericalDF = lsPattern.loadCSVToDataFrame(sqlContext,"file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/data/train_numeric.csv");
+
+              //  "data/numSmall.csv"); //train_numeric.csv
 
         System.out.println("================ FIND NUMERICAL PATTERN ============");
 
@@ -154,8 +179,8 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ LOAD CATEGORICAL  ============");
 
-        DataFrame categoricalDF = lsPattern.loadCSVToDataFrame(sqlContext,
-                "data/categSmall.csv"); //"  train_categorical.csv
+        DataFrame categoricalDF = lsPattern.loadCSVToDataFrame(sqlContext,"file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/data/train_categorical.csv");
+               // "data/categSmall.csv"); //"  train_categorical.csv
 
         System.out.println("================ FIND CATEGORICAL PATTERN ============");
 
@@ -163,41 +188,12 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ MERGE CATEGORICAL & NUMERICAL PATTERN ============");
 
-        JavaPairRDD result =  lsPattern.mergeCategNum(categRDD, numRDD);
+        JavaPairRDD result = lsPattern.mergeCategNum(categRDD, numRDD);
 
-       // result.saveAsTextFile("pattern.csv");
+        result.repartition(1).saveAsTextFile("file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/bosch-spark/pattern.csv");
 
         System.out.println(result.collect().size());
 
         System.out.println("================END LINE STATION PATTERN ============");
-    }
-
-    public static void displayMap3(Map<String, List<Integer>> map) {
-        for (Map.Entry<String, List<Integer>> entry : map.entrySet())
-        {
-            System.out.print(entry.getKey() + "/" + entry.getValue());
-           /* for (int i = 0 ; i  entry.getValue()) {
-                System.out.print(val);
-            }*/
-            System.out.println();
-        }
-    }
-
-    public void displayMap(Map<Integer, List<String>> map) {
-        for (Map.Entry<Integer, List<String>> entry : map.entrySet())
-        {
-            System.out.print(entry.getKey() + "/");
-            for (String val : entry.getValue()) {
-                System.out.print(val);
-            }
-            System.out.println();
-        }
-    }
-
-    public static void displayMap2(Map<Integer, String> map) {
-        for (Map.Entry<Integer, String> entry : map.entrySet())
-        {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
     }
 }
