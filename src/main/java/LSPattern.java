@@ -169,9 +169,7 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ LOAD NUMERICAL  ============");
 
-        DataFrame numericalDF = lsPattern.loadCSVToDataFrame(sqlContext,"file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/data/train_numeric.csv");
-
-              //  "data/numSmall.csv"); //train_numeric.csv
+        DataFrame numericalDF = lsPattern.loadCSVToDataFrame(sqlContext, "data/numSmall.csv"); //train_numeric.csv
 
         System.out.println("================ FIND NUMERICAL PATTERN ============");
 
@@ -179,8 +177,7 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ LOAD CATEGORICAL  ============");
 
-        DataFrame categoricalDF = lsPattern.loadCSVToDataFrame(sqlContext,"file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/data/train_categorical.csv");
-               // "data/categSmall.csv"); //"  train_categorical.csv
+        DataFrame categoricalDF = lsPattern.loadCSVToDataFrame(sqlContext,"data/categSmall.csv"); //"  train_categorical.csv
 
         System.out.println("================ FIND CATEGORICAL PATTERN ============");
 
