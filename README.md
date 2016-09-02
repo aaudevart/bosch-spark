@@ -31,11 +31,6 @@ The program is developped in Java, in Spark 1.6.
 The compilation is done my Maven.
 
 This program is configured to run in local mode.
-
-## Data
-  - Train Numeric
-  - Train Categorical
-  - 
   
 ## TODO
   - Add comment
