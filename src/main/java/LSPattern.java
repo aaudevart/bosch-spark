@@ -93,11 +93,11 @@ public class LSPattern implements Serializable {
 
     }
 
-    public JavaPairRDD mergeCategNum (JavaPairRDD categRDD, JavaPairRDD numRDD) {
+    public JavaPairRDD<String, List<Integer>> mergeCategNum (JavaPairRDD categRDD, JavaPairRDD numRDD) {
 
         JavaPairRDD mergeRDD = categRDD.join(numRDD);
 
-        return mergeRDD.mapToPair((PairFunction<Tuple2<Integer, Tuple2<List<String>, List<String>>>, String, Integer>) tuple -> {
+        JavaPairRDD mergeFlatRDD = mergeRDD.mapToPair((PairFunction<Tuple2<Integer, Tuple2<List<String>, List<String>>>, String, Integer>) tuple -> {
 
             Integer id = tuple._1;
 
@@ -120,17 +120,18 @@ public class LSPattern implements Serializable {
                 result = result + elt;
             }
 
+           // System.out.println(result + " " + id);
+
             return new Tuple2<>(result, id);
         });
+
+        return mergeFlatRDD.groupByKey();
 
     }
 
     public static void main(String[] args) {
 
-
         System.out.println("================START LINE STATION PATTERN  ============");
-
-        long startTime = System.currentTimeMillis();
 
         SparkConf sparkConf = new SparkConf()
                 .setAppName("LineStationPattern")
@@ -145,7 +146,7 @@ public class LSPattern implements Serializable {
         System.out.println("================ LOAD NUMERICAL  ============");
 
         DataFrame numericalDF = lsPattern.loadCSVToDataFrame(sqlContext,
-        "src/main/ressources/numSmall.csv"); //train_numeric.csv
+        "data/numSmall.csv"); //train_numeric.csv
 
         System.out.println("================ FIND NUMERICAL PATTERN ============");
 
@@ -154,7 +155,7 @@ public class LSPattern implements Serializable {
         System.out.println("================ LOAD CATEGORICAL  ============");
 
         DataFrame categoricalDF = lsPattern.loadCSVToDataFrame(sqlContext,
-                "src/main/ressources/categSmall.csv"); //"  train_categorical.csv
+                "data/categSmall.csv"); //"  train_categorical.csv
 
         System.out.println("================ FIND CATEGORICAL PATTERN ============");
 
@@ -162,9 +163,7 @@ public class LSPattern implements Serializable {
 
         System.out.println("================ MERGE CATEGORICAL & NUMERICAL PATTERN ============");
 
-        JavaPairRDD<String, Integer> mergeCategNumRDD = lsPattern.mergeCategNum(categRDD, numRDD);
-
-        JavaPairRDD result = mergeCategNumRDD.groupByKey();
+        JavaPairRDD result =  lsPattern.mergeCategNum(categRDD, numRDD);
 
        // result.saveAsTextFile("pattern.csv");
 
