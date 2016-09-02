@@ -18,10 +18,10 @@ Goal of this program : Find the list of all the components, which are manufactur
 
 ### Steps :
  - Load Numerical Data
- - Find for each component (in the numerical file) the machine list where the component is manufactured
+ - Find for each component (in the numerical file) the machines list where the component is manufactured
  - Load Categorical Data
- - Find for each component (in the categorical file) the machine list where the component is manufactured
- - Merge the 2 machine lists in order to find the complete machine list where the component is manufactured. And finally, know all the components which share the same machines.
+ - Find for each component (in the categorical file) the machines list where the component is manufactured
+ - Merge the 2 machine lists in order to find the complete machines list where the component is manufactured. And finally, know all the components which share the same machines.
  
 << There is about 7927 different paths for manufacturing all the components >>
 
@@ -31,6 +31,8 @@ The program is developped in Java, in Spark 1.6.
 The compilation is done my Maven.
 
 This program is configured to run in local mode.
+
+That take about 25min to execute this program on my own computer ( 16Go RAM) .
   
 ## TODO
   - Add comment
