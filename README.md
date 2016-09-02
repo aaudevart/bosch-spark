@@ -7,28 +7,24 @@ https://www.kaggle.com/c/bosch-production-line-performance/
 
 Bosch records data at every step along its assembly lines.
 
-In this competition, Bosch is challenging Kagglers to predict internal 
-failures using thousands of measurements and tests made for each component 
-along the assembly line. 
+In this competition, Bosch is challenging Kagglers to predict internal failures using thousands of measurements and tests made for each component along the assembly line. 
 This would enable Bosch to bring quality products at lower costs to the end user.
-
 
 ## What's the goal of this Java project ?
 
-We want to know for each component in what lines and stations it is been manufactured.
+The goal is to discover Bosch data !
 
+Goal of the first program : to find the list of all the components, which are manufactured in the same lines and stations.
 
-manufacturing processes.
+<< There is about 7927 different paths for manufacturing all the components >>
 
+## Set up
 
+The program is developped in Java, in Spark 1.6.
+The compilation is done my Maven.
 
-Data Used : 2 files
-Train Numeric
-Train Categorical
+This program is configured to run in local mode.
 
-Spark Program to identify a list of pattern line-station shared by different IDs 
-
-
-
-
-## THE END of the boring installation part, now eat and digest data to extract value!
+## Data
+  - Train Numeric
+  - Train Categorical
