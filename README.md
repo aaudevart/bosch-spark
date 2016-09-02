@@ -14,15 +14,15 @@ This would enable Bosch to bring quality products at lower costs to the end user
 
 The goal is to discover Bosch data !
 
-Goal of this program : Find the list of all the components, which are manufactured in the same lines and stations.
+Goal of this program : Find the list of all the components, which are manufactured in the same machines (identified by the line and the station).
 
 ### Steps :
-  - Load Numerical Data
-  - Find for each component (in the numerical file) the list of lines and stations where the component is manufactured
-  - Load Categorical Data
-  - Find for each component (in the categorical file) the list of lines and stations where the component is manufactured
-  - Merge the 2 lists in order to find the list of all the components, which are manufactured in the same lines and stations.
-
+ - Load Numerical Data
+ - Find for each component (in the numerical file) the machine list where the component is manufactured
+ - Load Categorical Data
+ - Find for each component (in the categorical file) the machine list where the component is manufactured
+ - Merge the 2 machine lists in order to find the complete machine list where the component is manufactured. And finally, know all the components which share the same machines.
+ 
 << There is about 7927 different paths for manufacturing all the components >>
 
 ## Set up
