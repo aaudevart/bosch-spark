@@ -28,3 +28,8 @@ This program is configured to run in local mode.
 ## Data
   - Train Numeric
   - Train Categorical
+  - 
+  
+## TODO
+  - Add comment
+  - Add new features to discover data... 
