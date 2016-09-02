@@ -14,7 +14,7 @@ This would enable Bosch to bring quality products at lower costs to the end user
 
 The goal is to discover Bosch data !
 
-Goal of the first program : to find the list of all the components, which are manufactured in the same lines and stations.
+Goal of this program : Find the list of all the components, which are manufactured in the same lines and stations.
 
 ### Steps :
   - Load Numerical Data
