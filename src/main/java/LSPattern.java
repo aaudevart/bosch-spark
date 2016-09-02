@@ -187,7 +187,7 @@ public class LSPattern implements Serializable {
 
         JavaPairRDD result = lsPattern.mergeCategNum(categRDD, numRDD);
 
-        result.repartition(1).saveAsTextFile("file:///Users/alexia/Documents/Projets/02-perso/Kaggle/bosch/bosch-spark/pattern.csv");
+        result.repartition(1).saveAsTextFile("pattern.csv");
 
         System.out.println(result.collect().size());
 
